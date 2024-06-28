@@ -6,7 +6,7 @@ const UserWhitelistSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-});
+}, { collection: 'user_whitelist' }); // Explicitly define the collection name
 
 const UserWhitelist = mongoose.model('UserWhitelist', UserWhitelistSchema);
 export default UserWhitelist;
