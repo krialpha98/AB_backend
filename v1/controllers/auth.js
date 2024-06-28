@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import UserWhitelist from "../models/UserWhitelist.js";  // Import the UserWhitelist model
 import Blacklist from "../models/Blacklist.js";
 import { SECRET_ACCESS_TOKEN } from "../config/index.js";
 import { validationResult } from "express-validator";
@@ -14,7 +15,17 @@ export async function Register(req, res) {
     }
 
     const { first_name, last_name, email, password } = req.body;
+
     try {
+        // Check if the email is in the whitelist
+        const whitelistedUser = await UserWhitelist.findOne({ email });
+        if (!whitelistedUser) {
+            return res.status(403).json({
+                status: "failed",
+                message: "You are not allowed to register with this email address.",
+            });
+        }
+
         const newUser = new User({
             first_name,
             last_name,
@@ -23,11 +34,12 @@ export async function Register(req, res) {
         });
 
         const existingUser = await User.findOne({ email });
-        if (existingUser)
+        if (existingUser) {
             return res.status(400).json({
                 status: "failed",
                 message: "It seems you already have an account, please log in instead.",
             });
+        }
 
         const savedUser = await newUser.save();
         const { role, ...user_data } = savedUser._doc;
@@ -46,8 +58,6 @@ export async function Register(req, res) {
     }
     res.end();
 }
-
-
 
 
 export async function Login(req, res) {
