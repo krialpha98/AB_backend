@@ -37,6 +37,7 @@ export async function Register(req, res) {
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log("Existing user found:", existingUser); // Debug log
             return res.status(400).json({
                 status: "failed",
                 message: "It seems you already have an account, please log in instead.",
@@ -60,6 +61,7 @@ export async function Register(req, res) {
     }
     res.end();
 }
+
 
 
 export async function Login(req, res) {
