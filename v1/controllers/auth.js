@@ -10,7 +10,7 @@ export async function Register(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log("Validation errors:", errors.array());
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ message: "Password must be at least 8 characters long." });
     }
 
     const { first_name, last_name, email, password } = req.body;
@@ -46,6 +46,7 @@ export async function Register(req, res) {
     }
     res.end();
 }
+
 
 
 
