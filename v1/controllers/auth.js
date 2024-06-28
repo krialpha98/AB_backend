@@ -5,6 +5,7 @@ import Blacklist from "../models/Blacklist.js";
 import { SECRET_ACCESS_TOKEN } from "../config/index.js";
 
 export async function Register(req, res) {
+    console.log("Request body:", req.body); // Log the incoming request data
     const { first_name, last_name, email, password } = req.body;
     try {
         const newUser = new User({
@@ -37,6 +38,7 @@ export async function Register(req, res) {
     }
     res.end();
 }
+
 
 export async function Login(req, res) {
     const { email } = req.body;
