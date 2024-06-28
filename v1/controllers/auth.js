@@ -17,15 +17,17 @@ export async function Register(req, res) {
     const { first_name, last_name, email, password } = req.body;
 
     try {
-        // Check if the email is in the whitelist
+        console.log("Checking whitelist for email:", email); // Debug log
         const whitelistedUser = await UserWhitelist.findOne({ email });
         if (!whitelistedUser) {
+            console.log("Email not in whitelist:", email); // Debug log
             return res.status(403).json({
                 status: "failed",
                 message: "You are not allowed to register with this email address.",
             });
         }
 
+        console.log("Email is whitelisted:", email); // Debug log
         const newUser = new User({
             first_name,
             last_name,
