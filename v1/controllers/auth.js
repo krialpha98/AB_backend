@@ -3,9 +3,16 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Blacklist from "../models/Blacklist.js";
 import { SECRET_ACCESS_TOKEN } from "../config/index.js";
+import { validationResult } from "express-validator";
 
 export async function Register(req, res) {
     console.log("Request body:", req.body); // Log the incoming request data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log("Validation errors:", errors.array());
+        return res.status(422).json({ errors: errors.array() });
+    }
+
     const { first_name, last_name, email, password } = req.body;
     try {
         const newUser = new User({
@@ -31,6 +38,7 @@ export async function Register(req, res) {
             message: "Thank you for registering with us. Your account has been successfully created.",
         });
     } catch (err) {
+        console.error('Error saving user:', err);
         res.status(500).json({
             status: "error",
             message: "Internal Server Error",
@@ -38,6 +46,7 @@ export async function Register(req, res) {
     }
     res.end();
 }
+
 
 
 export async function Login(req, res) {
