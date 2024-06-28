@@ -10,8 +10,8 @@ router.post(
     "/register",
     check("email")
         .isEmail()
-        .withMessage("Enter a valid email address")
-        .normalizeEmail(),
+        .withMessage("Enter a valid email address"),
+        //.normalizeEmail(), //
     check("first_name")
         .not()
         .isEmpty()
