@@ -7,11 +7,17 @@ import App from "./routes/index.js";
 
 const server = express();
 
-server.use(cors());
-server.disable("x-powered-by");
+// Configure CORS
+const corsOptions = {
+    origin: 'https://ab-frontend-heroku-7f40be8a10e4.herokuapp.com', // Replace with your actual frontend URL
+    credentials: true,
+};
+
+server.use(cors(corsOptions));
 server.use(cookieParser());
 server.use(express.urlencoded({ extended: false }));
 server.use(express.json());
+server.disable("x-powered-by");
 
 mongoose.promise = global.Promise;
 mongoose.set("strictQuery", false);
@@ -24,11 +30,6 @@ mongoose
     .catch((err) => console.log(err));
 
 server.use(App);
-
-server.use(cors({
-    origin: 'https://ab-frontend-heroku-7f40be8a10e4.herokuapp.com', // Replace with your actual frontend URL
-    credentials: true,
-}));
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
