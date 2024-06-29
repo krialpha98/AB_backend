@@ -62,10 +62,8 @@ export async function Register(req, res) {
     res.end();
 }
 
-
-
 export async function Login(req, res) {
-    const { email } = req.body;
+    const { email, password } = req.body;
     try {
         const user = await User.findOne({ email }).select("+password");
         if (!user)
@@ -74,7 +72,7 @@ export async function Login(req, res) {
                 message: "Account does not exist",
             });
 
-        const isPasswordValid = bcrypt.compare(req.body.password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);  // Await the bcrypt.compare
         if (!isPasswordValid)
             return res.status(401).json({
                 status: "failed",
@@ -93,6 +91,12 @@ export async function Login(req, res) {
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
+            user: {
+                id: user._id,
+                name: user.first_name + " " + user.last_name,
+                email: user.email
+                // Add any other fields you want to return
+            }
         });
     } catch (err) {
         res.status(500).json({
