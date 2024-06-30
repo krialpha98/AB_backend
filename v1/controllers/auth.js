@@ -109,6 +109,7 @@ export async function Login(req, res) {
     res.end();
 }
 
+
 export async function Logout(req, res) {
     try {
         const authHeader = req.headers["cookie"];
