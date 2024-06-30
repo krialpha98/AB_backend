@@ -67,18 +67,20 @@ export async function Login(req, res) {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email }).select("+password");
-        if (!user)
+        if (!user) {
             return res.status(401).json({
                 status: "failed",
                 message: "Account does not exist",
             });
+        }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);  // Await the bcrypt.compare
-        if (!isPasswordValid)
+        if (!isPasswordValid) {
             return res.status(401).json({
                 status: "failed",
                 message: "Invalid email or password. Please try again with the correct credentials.",
             });
+        }
 
         let options = {
             maxAge: 20 * 60 * 1000,
@@ -87,7 +89,7 @@ export async function Login(req, res) {
             sameSite: "None",
         };
 
-        const token = user.generateAccessJWT();
+        const token = jwt.sign({ id: user._id }, SECRET_ACCESS_TOKEN, { expiresIn: '20m' });
         res.cookie("SessionID", token, options);
         res.status(200).json({
             status: "success",
@@ -96,7 +98,6 @@ export async function Login(req, res) {
                 id: user._id,
                 name: user.first_name + " " + user.last_name,
                 email: user.email
-                // Add any other fields you want to return
             }
         });
     } catch (err) {

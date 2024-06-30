@@ -1,7 +1,7 @@
 import User from "../models/User.js";
-import jwt from "jsonwebtoken";
-import Blacklist from "../models/Blacklist.js";
-import { SECRET_ACCESS_TOKEN } from "../config/index.js";
+import jwt from 'jsonwebtoken';
+import { SECRET_ACCESS_TOKEN } from '../config/index.js';
+import Blacklist from '../models/Blacklist.js';
 
 export async function Verify(req, res, next) {
     const authHeader = req.headers["cookie"];
