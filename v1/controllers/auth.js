@@ -74,7 +74,7 @@ export async function Login(req, res) {
             });
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);  // Await the bcrypt.compare
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({
                 status: "failed",
@@ -83,10 +83,10 @@ export async function Login(req, res) {
         }
 
         let options = {
-            maxAge: 20 * 60 * 1000,
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
+            maxAge: 20 * 60 * 1000, // 20 minutes
+            httpOnly: true,         // Accessible only by web server
+            secure: true,           // HTTPS only
+            sameSite: "None",       // Allow cross-site cookies
         };
 
         const token = jwt.sign({ id: user._id }, SECRET_ACCESS_TOKEN, { expiresIn: '20m' });

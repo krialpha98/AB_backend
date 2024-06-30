@@ -29,7 +29,7 @@ mongoose
     .then(() => console.log("Connected to database"))
     .catch((err) => console.log(err));
 
-server.use(App);
+server.use('/v1', App); // Make sure the routes are registered correctly
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
