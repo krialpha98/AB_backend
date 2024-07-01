@@ -82,6 +82,13 @@ export async function Login(req, res) {
             });
         }
 
+        // Include iat (issued at) and exp (expiration) claims
+        const token = jwt.sign(
+            { id: user._id },
+            SECRET_ACCESS_TOKEN,
+            { expiresIn: '20m' } // Token expires in 20 minutes
+        );
+
         let options = {
             maxAge: 20 * 60 * 1000, // 20 minutes
             httpOnly: true,         // Accessible only by web server
@@ -89,7 +96,6 @@ export async function Login(req, res) {
             sameSite: "None",       // Allow cross-site cookies
         };
 
-        const token = jwt.sign({ id: user._id }, SECRET_ACCESS_TOKEN, { expiresIn: '20m' });
         res.cookie("SessionID", token, options);
         res.status(200).json({
             status: "success",
