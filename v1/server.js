@@ -28,7 +28,7 @@ mongoose
     .then(() => console.log("Connected to database"))
     .catch((err) => console.log(err));
 
-server.use('/v1', App);
+server.use(App);
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
