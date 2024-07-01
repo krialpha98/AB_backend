@@ -7,10 +7,9 @@ import App from "./routes/index.js";
 
 const server = express();
 
-// Configure CORS
 const corsOptions = {
-    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com', // Replace with your actual frontend URL
-    credentials: true,
+    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com', // Your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
 server.use(cors(corsOptions));
@@ -29,8 +28,11 @@ mongoose
     .then(() => console.log("Connected to database"))
     .catch((err) => console.log(err));
 
-server.use(App);
+server.use('/v1', App);
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
 );
+
+
+
