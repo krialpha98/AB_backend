@@ -8,7 +8,7 @@ import App from "./routes/index.js";
 const server = express();
 
 const corsOptions = {
-    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com', // Your frontend URL
+    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com/', // Your frontend URL
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
