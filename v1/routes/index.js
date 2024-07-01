@@ -1,12 +1,13 @@
 import express from "express";
 import Auth from "./auth.js";
+import Conversation from "./conversation.js"; // Ensure you import other route files
 import { Verify, VerifyRole } from "../middleware/verify.js";
 
-const app = express();
+const router = express.Router();
 
-app.disable("x-powered-by");
+router.disable("x-powered-by");
 
-app.get("/v1", (req, res) => {
+router.get("/", (req, res) => {
     try {
         res.status(200).json({
             status: "success",
@@ -20,20 +21,27 @@ app.get("/v1", (req, res) => {
     }
 });
 
-app.use("/v1/auth", Auth);
+// Authentication routes should not require the Verify middleware
+router.use("/auth", Auth);
 
-app.get("/v1/user", Verify, (req, res) => {
+// Apply Verify middleware to all routes defined after this point
+router.use(Verify);
+
+router.get("/user", (req, res) => {
     res.status(200).json({
         status: "success",
         message: "Welcome to your Dashboard!",
     });
 });
 
-app.get("/v1/admin", Verify, VerifyRole, (req, res) => {
+router.get("/admin", VerifyRole, (req, res) => {
     res.status(200).json({
         status: "success",
         message: "Welcome to the Admin portal!",
     });
 });
 
-export default app;
+// Mount the Conversation router under /conversation path
+router.use("/conversation", Conversation);
+
+export default router;
