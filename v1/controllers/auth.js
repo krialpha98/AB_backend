@@ -113,18 +113,26 @@ export async function Login(req, res) {
 
 export async function Logout(req, res) {
     try {
-        const authHeader = req.headers["cookie"];
-        if (!authHeader) return res.sendStatus(204);
+        const authHeader = req.headers["authorization"];
+        if (!authHeader) {
+            console.log("No authorization header found");
+            return res.sendStatus(204);
+        }
 
-        const cookie = authHeader.split('=')[1];
-        const accessToken = cookie.split(';')[0];
-        const checkIfBlacklisted = await Blacklist.findOne({ token: accessToken });
+        const token = authHeader.split(" ")[1]; // Extract the token from "Bearer <token>"
+        if (!token) {
+            console.log("Token not found in authorization header");
+            return res.status(401).json({ message: "Unauthorized" });
+        }
 
-        if (checkIfBlacklisted) return res.sendStatus(204);
+        const checkIfBlacklisted = await Blacklist.findOne({ token });
+        if (checkIfBlacklisted) {
+            console.log("Token is blacklisted");
+            return res.sendStatus(204);
+        }
 
-        const newBlacklist = new Blacklist({ token: accessToken });
+        const newBlacklist = new Blacklist({ token });
         await newBlacklist.save();
-        res.setHeader('Clear-Site-Data', '"cookies"');
         res.status(200).json({ message: 'You are logged out!' });
     } catch (err) {
         res.status(500).json({

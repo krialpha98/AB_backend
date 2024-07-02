@@ -1,9 +1,8 @@
-// v1/routes/auth.js
 import express from "express";
 import { Register, Login, Logout } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check } from "express-validator";
-import { Verify } from '../middleware/verify.js'; // Ensure the correct middleware is imported
+import { Verify } from '../middleware/verify.js';
 
 const router = express.Router();
 
@@ -42,7 +41,7 @@ router.post(
     Login
 );
 
-router.get("/logout", Logout);
+router.get("/logout", Verify, Logout); // Ensure Verify middleware is applied
 
 // Add the /me endpoint to get the current authenticated user
 router.get("/me", Verify, (req, res) => {
