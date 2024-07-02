@@ -94,6 +94,7 @@ export async function Login(req, res) {
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
+            token: token, // Include the token in the response body
             user: {
                 id: user._id,
                 name: user.first_name + " " + user.last_name,
