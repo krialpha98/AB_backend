@@ -74,5 +74,8 @@ export const streamResponse = (req, res) => {
         })
         .on('end', () => res.end());
 
-    req.on('close', () => run.cancel());
+    req.on('close', () => {
+        console.log('Connection closed');
+        // Additional cleanup if necessary
+    });
 };
