@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import { PORT, URI } from "./config/index.js";
 import App from "./routes/index.js";
-import ConversationRoutes from "./routes/conversation.js"; // Add this line
+import ConversationRoutes from "./routes/conversation.js"; // Import the conversation routes
 
 const server = express();
 
@@ -31,7 +31,7 @@ mongoose
     .catch((err) => console.log(err));
 
 server.use(App);
-server.use("/api/conversation", ConversationRoutes); // Add this line
+server.use("/v1/conversation", ConversationRoutes); // Use the conversation routes
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
