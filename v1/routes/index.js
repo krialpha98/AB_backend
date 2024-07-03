@@ -1,5 +1,6 @@
 import express from "express";
 import Auth from "./auth.js";
+import Assistant from "./assistant.js";
 import { Verify, VerifyRole } from "../middleware/verify.js";
 
 const app = express();
@@ -21,6 +22,9 @@ app.get("/v1", (req, res) => {
 });
 
 app.use("/v1/auth", Auth);
+
+// Ensure these routes are protected by the Verify middleware
+app.use("/v1/assistant", Verify, Assistant);
 
 app.get("/v1/user", Verify, (req, res) => {
     res.status(200).json({
