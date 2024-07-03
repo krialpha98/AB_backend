@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI();
+// Initialize OpenAI client with API key from environment variables
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
 // In-memory store for threads (consider using a database for production)
 const threads = {};
@@ -44,10 +45,8 @@ export const streamResponse = (req, res) => {
         return res.status(404).json({ error: 'Thread not found' });
     }
 
-    const ASSISTANT_ID = 'asst_qXe9zOvg7nDifslUtHCJY9Oh';
-
     const run = openai.beta.threads.runs.stream(threadId, {
-        assistant_id: ASSISTANT_ID
+        assistant_id: 'your_assistant_id'
     });
 
     res.setHeader('Content-Type', 'text/event-stream');
