@@ -46,7 +46,7 @@ export const streamResponse = (req, res) => {
     }
 
     const run = openai.beta.threads.runs.stream(threadId, {
-        assistant_id: 'your_assistant_id'
+        assistant_id: 'asst_qXe9zOvg7nDifslUtHCJY9Oh'
     });
 
     res.setHeader('Content-Type', 'text/event-stream');
