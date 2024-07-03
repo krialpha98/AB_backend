@@ -1,11 +1,10 @@
-import express from "express";
-import { initializeConversation } from "../controllers/conversation.js";
-import { Verify } from "../middleware/verify.js";
+import express from 'express';
+import { createThread, addMessage, streamResponse } from '../controllers/conversation.js';
 
 const router = express.Router();
 
-// Define a POST route at /init
-// Apply the Verify middleware to ensure only authenticated requests can access this route
-router.post("/init", Verify, initializeConversation);
+router.post('/threads', createThread);
+router.post('/threads/:threadId/messages', addMessage);
+router.get('/threads/:threadId/stream', streamResponse);
 
 export default router;
