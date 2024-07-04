@@ -37,13 +37,15 @@ export const addMessage = async (req, res) => {
     const { threadId, content } = req.body;
     const userId = req.user._id;
 
+    // Log incoming data
     console.log("Thread ID:", threadId);
     console.log("Message content:", content);
     console.log("User ID:", userId);
 
-    // Retrieve the current messages in the thread
-    const messagesBefore = await openai.beta.threads.messages.list(threadId);
-    const lastMessageId = messagesBefore[messagesBefore.length - 1]?.id;
+    // Retrieve the current list of messages in the thread
+    const currentMessages = await openai.beta.threads.messages.list(threadId);
+    const lastMessageId = currentMessages.messages[currentMessages.messages.length - 1].id;
+    console.log("Last message ID before adding new user message:", lastMessageId);
 
     // Add the user message to the thread
     const message = await openai.beta.threads.messages.create(threadId, {
@@ -53,20 +55,20 @@ export const addMessage = async (req, res) => {
     console.log("User message added to thread:", message);
 
     // Run the assistant on the thread to get a response
-    const run = await openai.beta.threads.runs.create(threadId, {
+    const run = await openai.beta.threads.runs.createAndPoll(threadId, {
       assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh",
     });
     console.log("Assistant run response:", run);
 
-    // Retrieve messages after the last message before the run
-    const messagesAfter = await openai.beta.threads.messages.list(threadId, { before: lastMessageId });
+    // Retrieve the list of messages again after the run
+    const messagesAfterRun = await openai.beta.threads.messages.list(threadId, { after: lastMessageId });
+    console.log("Messages after run:", messagesAfterRun);
 
     // Extract the assistant's response message
-    const assistantMessage = messagesAfter.find(m => m.role === "assistant");
+    const assistantMessage = messagesAfterRun.messages.find(msg => msg.role === "assistant");
     if (!assistantMessage) {
       throw new Error("No assistant message found in the run result.");
     }
-
     console.log("Assistant's response message:", assistantMessage);
 
     // Return the assistant's response to the client
