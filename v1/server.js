@@ -9,7 +9,7 @@ const server = express();
 
 // Configure CORS
 const corsOptions = {
-    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com', // Replace with your actual frontend URL
+    origin: '*', // Allow all origins for development purposes
     credentials: true,
 };
 
@@ -34,3 +34,4 @@ server.use(App);
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
 );
+
