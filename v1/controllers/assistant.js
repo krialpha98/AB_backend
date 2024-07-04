@@ -32,15 +32,45 @@ export const createThread = async (req, res) => {
 };
   
 
-export const addMessageToThread = async (req, res) => {
-  const { threadId, content } = req.body;
+export const addMessage = async (req, res) => {
   try {
-    const message = await openai.beta.threads.messages.create(threadId, {
-      role: "user",
-      content: content,
-    });
-    res.status(200).json({ messageId: message.id });
+    console.log("Received request to add message.");
+
+    const { threadId, content } = req.body;
+    const userId = req.user._id;
+
+    // Log incoming data
+    console.log("Thread ID:", threadId);
+    console.log("Message content:", content);
+    console.log("User ID:", userId);
+
+    // Add the user message to the thread
+    const message = await openai.beta.threads.messages.create(
+      threadId,
+      {
+        role: "user",
+        content: content,
+      }
+    );
+    console.log("User message added to thread:", message);
+
+    // Run the assistant on the thread to get a response
+    const run = await openai.beta.threads.runs.createAndPoll(
+      threadId,
+      { 
+        assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh" // Use your assistant ID
+      }
+    );
+    console.log("Assistant run response:", run);
+
+    // Extract the assistant's response message
+    const assistantMessage = run.result.message;
+    console.log("Assistant's response message:", assistantMessage);
+
+    // Return the assistant's response to the client
+    res.status(200).json({ content: assistantMessage.content });
   } catch (error) {
+    console.error("Error adding message:", error);
     res.status(500).json({ error: error.message });
   }
 };
