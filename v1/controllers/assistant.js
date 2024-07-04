@@ -3,24 +3,31 @@ import OpenAI from "openai";
 const openai = new OpenAI();
 
 export const createThread = async (req, res) => {
-    try {
-      const thread = await openai.beta.threads.create();
-      const userId = req.user._id; // Assuming the user ID is attached to req.user by the Verify middleware
-      const userEmail = req.user.email; // Assuming the user email is attached to req.user by the Verify middleware
-  
-      const newThread = new Thread({
-        threadId: thread.id,
-        userId: userId,
-        userEmail: userEmail,
-      });
-  
-      await newThread.save();
-  
-      res.status(200).json({ threadId: thread.id });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+  try {
+    console.log("Received request to create thread.");
+    
+    // Assuming the request has been authenticated and req.user is available
+    console.log("User info:", req.user);
+
+    const thread = await openai.beta.threads.create();
+    console.log("OpenAI thread creation response:", thread);
+
+    const userEmail = req.user.email;
+
+    const newThread = new Thread({
+      threadId: thread.id,
+      userEmail: userEmail,
+    });
+
+    await newThread.save();
+    console.log("New thread saved to database with ID:", newThread.threadId);
+
+    res.status(200).json({ threadId: thread.id });
+  } catch (error) {
+    console.error("Error creating thread:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
   
 
 export const addMessageToThread = async (req, res) => {
