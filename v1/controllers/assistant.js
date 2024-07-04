@@ -30,7 +30,6 @@ export const createThread = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-  
 
 export const addMessage = async (req, res) => {
   try {
@@ -64,7 +63,12 @@ export const addMessage = async (req, res) => {
     console.log("Assistant run response:", run);
 
     // Extract the assistant's response message
-    const assistantMessage = run.result.message;
+    const assistantMessages = run.result.messages;
+    if (!assistantMessages || assistantMessages.length === 0) {
+      throw new Error("No assistant message found in the run result.");
+    }
+
+    const assistantMessage = assistantMessages[assistantMessages.length - 1];
     console.log("Assistant's response message:", assistantMessage);
 
     // Return the assistant's response to the client
