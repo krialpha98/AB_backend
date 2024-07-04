@@ -1,19 +1,15 @@
 import OpenAI from "openai";
-import Thread from "../models/Thread.js";  // Ensure this path is correct
+import Thread from "../models/Thread.js"; // Adjust the path as needed
 
 const openai = new OpenAI();
 
 export const createThread = async (req, res) => {
   try {
     console.log("Received request to create thread.");
-    
-    // Assuming the request has been authenticated and req.user is available
-    console.log("User info:", req.user);
+    const userEmail = req.user.email;
 
     const thread = await openai.beta.threads.create();
     console.log("OpenAI thread creation response:", thread);
-
-    const userEmail = req.user.email;
 
     const newThread = new Thread({
       threadId: thread.id,
@@ -33,99 +29,102 @@ export const createThread = async (req, res) => {
 export const addMessage = async (req, res) => {
   try {
     console.log("Received request to add message.");
-
     const { threadId, content } = req.body;
     const userId = req.user._id;
 
-    // Log incoming data
-    console.log("Thread ID:", threadId);
-    console.log("Message content:", content);
-    console.log("User ID:", userId);
-
-    // Retrieve the current list of messages in the thread
-    const currentMessages = await openai.beta.threads.messages.list(threadId);
-    const lastMessageId = currentMessages.messages[currentMessages.messages.length - 1].id;
-    console.log("Last message ID before adding new user message:", lastMessageId);
-
-    // Add the user message to the thread
     const message = await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: content,
     });
     console.log("User message added to thread:", message);
 
-    // Run the assistant on the thread to get a response
-    const run = await openai.beta.threads.runs.createAndPoll(threadId, {
+    const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh",
     });
     console.log("Assistant run response:", run);
 
-    // Retrieve the list of messages again after the run
-    const messagesAfterRun = await openai.beta.threads.messages.list(threadId, { after: lastMessageId });
-    console.log("Messages after run:", messagesAfterRun);
-
-    // Extract the assistant's response message
-    const assistantMessage = messagesAfterRun.messages.find(msg => msg.role === "assistant");
-    if (!assistantMessage) {
-      throw new Error("No assistant message found in the run result.");
-    }
-    console.log("Assistant's response message:", assistantMessage);
-
-    // Return the assistant's response to the client
-    res.status(200).json({ content: assistantMessage.content });
+    res.status(200).json({ runId: run.id });
   } catch (error) {
     console.error("Error adding message:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-export const runAssistant = async (req, res) => {
-  const { threadId } = req.body;
-  const assistantId = "asst_qXe9zOvg7nDifslUtHCJY9Oh";
+export const listMessages = async (req, res) => {
   try {
-    console.log("Received request to run assistant.");
-    console.log("Thread ID:", threadId);
+    const { threadId } = req.params;
+    const messages = await openai.beta.threads.messages.list(threadId);
+    res.status(200).json(messages.data);
+  } catch (error) {
+    console.error("Error listing messages:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    const run = await openai.beta.threads.runs.createAndPoll(threadId, {
-      assistant_id: assistantId,
+export const getMessage = async (req, res) => {
+  try {
+    const { threadId, messageId } = req.params;
+    const message = await openai.beta.threads.messages.retrieve(threadId, messageId);
+    res.status(200).json(message);
+  } catch (error) {
+    console.error("Error retrieving message:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const createRun = async (req, res) => {
+  try {
+    const { threadId } = req.params;
+    const run = await openai.beta.threads.runs.create(threadId, {
+      assistant_id: "your_assistant_id_here",
     });
-    console.log("Assistant run response:", run);
-
-    res.status(200).json({ runId: run.id });
+    res.status(200).json(run);
   } catch (error) {
-    console.error("Error running assistant:", error);
+    console.error("Error creating run:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-export const getThreadMessages = async (req, res) => {
-  const { threadId } = req.params;
+export const listRuns = async (req, res) => {
   try {
-    console.log("Received request to get thread messages.");
-    console.log("Thread ID:", threadId);
-
-    const thread = await openai.beta.threads.retrieve(threadId);
-    console.log("Retrieved thread messages:", thread.messages);
-
-    res.status(200).json(thread.messages);
+    const { threadId } = req.params;
+    const runs = await openai.beta.threads.runs.list(threadId);
+    res.status(200).json(runs.data);
   } catch (error) {
-    console.error("Error getting thread messages:", error);
+    console.error("Error listing runs:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-export const cancelRun = async (req, res) => {
-  const { runId } = req.body;
+export const getRun = async (req, res) => {
   try {
-    console.log("Received request to cancel run.");
-    console.log("Run ID:", runId);
-
-    const cancelledRun = await openai.beta.threads.runs.cancel(runId);
-    console.log("Cancelled run:", cancelledRun);
-
-    res.status(200).json({ cancelledRunId: cancelledRun.id });
+    const { threadId, runId } = req.params;
+    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+    res.status(200).json(run);
   } catch (error) {
-    console.error("Error cancelling run:", error);
+    console.error("Error retrieving run:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const listRunSteps = async (req, res) => {
+  try {
+    const { threadId, runId } = req.params;
+    const steps = await openai.beta.threads.runs.steps.list(threadId, runId);
+    res.status(200).json(steps.data);
+  } catch (error) {
+    console.error("Error listing run steps:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getRunStep = async (req, res) => {
+  try {
+    const { threadId, runId, stepId } = req.params;
+    const step = await openai.beta.threads.runs.steps.retrieve(threadId, runId, stepId);
+    res.status(200).json(step);
+  } catch (error) {
+    console.error("Error retrieving run step:", error);
     res.status(500).json({ error: error.message });
   }
 };

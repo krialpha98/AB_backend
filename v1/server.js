@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import { PORT, URI } from "./config/index.js";
 import App from "./routes/index.js";
+import assistantRoutes from "./routes/assistant.js"; // Import the new assistant routes
 
 const server = express();
 
@@ -30,8 +31,8 @@ mongoose
     .catch((err) => console.log(err));
 
 server.use(App);
+server.use("/v1/assistant", assistantRoutes); // Use the new assistant routes
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
 );
-
