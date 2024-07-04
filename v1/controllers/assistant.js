@@ -37,40 +37,36 @@ export const addMessage = async (req, res) => {
     const { threadId, content } = req.body;
     const userId = req.user._id;
 
-    // Log incoming data
     console.log("Thread ID:", threadId);
     console.log("Message content:", content);
     console.log("User ID:", userId);
 
+    // Retrieve the current messages in the thread
+    const messagesBefore = await openai.beta.threads.messages.list(threadId);
+    const lastMessageId = messagesBefore[messagesBefore.length - 1]?.id;
+
     // Add the user message to the thread
-    const message = await openai.beta.threads.messages.create(
-      threadId,
-      {
-        role: "user",
-        content: content,
-      }
-    );
+    const message = await openai.beta.threads.messages.create(threadId, {
+      role: "user",
+      content: content,
+    });
     console.log("User message added to thread:", message);
 
     // Run the assistant on the thread to get a response
-    const run = await openai.beta.threads.runs.createAndPoll(
-      threadId,
-      { 
-        assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh" // Use your assistant ID
-      }
-    );
+    const run = await openai.beta.threads.runs.create(threadId, {
+      assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh",
+    });
     console.log("Assistant run response:", run);
 
-    // Log the full run object to understand its structure
-    console.log("Full run object:", JSON.stringify(run, null, 2));
+    // Retrieve messages after the last message before the run
+    const messagesAfter = await openai.beta.threads.messages.list(threadId, { before: lastMessageId });
 
     // Extract the assistant's response message
-    const assistantMessages = run.result?.assistant_messages || run.result?.messages;
-    if (!assistantMessages || assistantMessages.length === 0) {
+    const assistantMessage = messagesAfter.find(m => m.role === "assistant");
+    if (!assistantMessage) {
       throw new Error("No assistant message found in the run result.");
     }
 
-    const assistantMessage = assistantMessages[assistantMessages.length - 1];
     console.log("Assistant's response message:", assistantMessage);
 
     // Return the assistant's response to the client
