@@ -1,6 +1,5 @@
 import OpenAI from "openai";
-import Thread from "../models/Thread.js";  // Make sure this path is correct
-
+import Thread from "../models/Thread.js";  // Ensure this path is correct
 
 const openai = new OpenAI();
 
@@ -62,8 +61,11 @@ export const addMessage = async (req, res) => {
     );
     console.log("Assistant run response:", run);
 
+    // Log the full run object to understand its structure
+    console.log("Full run object:", JSON.stringify(run, null, 2));
+
     // Extract the assistant's response message
-    const assistantMessages = run.result.messages;
+    const assistantMessages = run.result?.assistant_messages || run.result?.messages;
     if (!assistantMessages || assistantMessages.length === 0) {
       throw new Error("No assistant message found in the run result.");
     }
@@ -83,11 +85,17 @@ export const runAssistant = async (req, res) => {
   const { threadId } = req.body;
   const assistantId = "asst_qXe9zOvg7nDifslUtHCJY9Oh";
   try {
+    console.log("Received request to run assistant.");
+    console.log("Thread ID:", threadId);
+
     const run = await openai.beta.threads.runs.createAndPoll(threadId, {
       assistant_id: assistantId,
     });
+    console.log("Assistant run response:", run);
+
     res.status(200).json({ runId: run.id });
   } catch (error) {
+    console.error("Error running assistant:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -95,9 +103,15 @@ export const runAssistant = async (req, res) => {
 export const getThreadMessages = async (req, res) => {
   const { threadId } = req.params;
   try {
+    console.log("Received request to get thread messages.");
+    console.log("Thread ID:", threadId);
+
     const thread = await openai.beta.threads.retrieve(threadId);
+    console.log("Retrieved thread messages:", thread.messages);
+
     res.status(200).json(thread.messages);
   } catch (error) {
+    console.error("Error getting thread messages:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -105,9 +119,15 @@ export const getThreadMessages = async (req, res) => {
 export const cancelRun = async (req, res) => {
   const { runId } = req.body;
   try {
+    console.log("Received request to cancel run.");
+    console.log("Run ID:", runId);
+
     const cancelledRun = await openai.beta.threads.runs.cancel(runId);
+    console.log("Cancelled run:", cancelledRun);
+
     res.status(200).json({ cancelledRunId: cancelledRun.id });
   } catch (error) {
+    console.error("Error cancelling run:", error);
     res.status(500).json({ error: error.message });
   }
 };
