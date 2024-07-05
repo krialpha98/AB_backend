@@ -26,6 +26,20 @@ export const createThread = async (req, res) => {
   }
 };
 
+export const getRunStatus = async (req, res) => {
+  const { runId } = req.params;
+
+  try {
+    const runStatus = await openai.beta.threads.runs.retrieve(runId);
+    console.log("Run status response:", runStatus);
+
+    res.status(200).json(runStatus);
+  } catch (error) {
+    console.error("Error retrieving run status:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const addMessage = async (req, res) => {
   try {
     console.log("Received request to add message.");

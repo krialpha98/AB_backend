@@ -9,12 +9,12 @@ import {
   getRun,
   listRunSteps,
   getRunStep,
+  getRunStatus,
 } from "../controllers/assistant.js";
-import {Verify} from "../middleware/verify.js";
+import { Verify } from "../middleware/verify.js";
 
 const router = express.Router();
 
-// Add the `Verify` middleware to all routes
 router.post("/create-thread", Verify, createThread);
 router.post("/add-message", Verify, addMessage);
 router.get("/threads/:threadId/messages", Verify, listMessages);
@@ -24,5 +24,6 @@ router.get("/threads/:threadId/runs", Verify, listRuns);
 router.get("/threads/:threadId/runs/:runId", Verify, getRun);
 router.get("/threads/:threadId/runs/:runId/steps", Verify, listRunSteps);
 router.get("/threads/:threadId/runs/:runId/steps/:stepId", Verify, getRunStep);
+router.get("/runs/:runId/status", Verify, getRunStatus);
 
 export default router;
