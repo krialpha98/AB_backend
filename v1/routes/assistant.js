@@ -10,7 +10,7 @@ import {
   listRunSteps,
   getRunStep,
 } from "../controllers/assistant.js";
-import Verify from "../middleware/verify.js";
+import {Verify} from "../middleware/verify.js";
 
 const router = express.Router();
 
