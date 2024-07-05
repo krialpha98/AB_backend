@@ -1,5 +1,5 @@
 import express from "express";
-import { Register, Login, Logout } from "../controllers/auth.js";
+import { Register, Login, Logout, validateToken } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check } from "express-validator";
 import { Verify } from '../middleware/verify.js';
@@ -41,11 +41,6 @@ router.post(
     Login
 );
 
-router.get("/logout", Verify, Logout); // Ensure Verify middleware is applied
-
-// Add the /me endpoint to get the current authenticated user
-router.get("/me", Verify, (req, res) => {
-    res.json({ user: req.user });
-});
+router.post("/validate-token", validateToken);
 
 export default router;

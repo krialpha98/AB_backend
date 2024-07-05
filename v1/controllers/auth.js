@@ -150,3 +150,22 @@ export async function Logout(req, res) {
     }
     res.end();
 }
+
+export function validateToken(req, res) {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+        return res.status(401).json({ status: "failed", message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ status: "failed", message: "No token provided" });
+    }
+
+    jwt.verify(token, SECRET_ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ status: "failed", message: "Invalid token" });
+        }
+        res.status(200).json({ status: "success", message: "Token is valid" });
+    });
+}
