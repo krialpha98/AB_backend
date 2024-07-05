@@ -43,14 +43,16 @@ export const addMessage = async (req, res) => {
     const { threadId, content } = req.body;
     const userId = req.user.id;
 
+    // Ensure threadId is defined
+    if (!threadId) {
+      throw new Error("threadId is not defined");
+    }
+
     // Add the user message to the thread
-    const userMessage = await openai.beta.threads.messages.create(
-      threadId,
-      {
-        role: 'user', // Ensure the 'role' parameter is included
-        content: [{ type: 'text', text: content }],
-      }
-    );
+    const userMessage = await openai.beta.threads.messages.create(threadId, {
+      role: 'user',  // Ensure the 'role' parameter is included
+      content: [{ type: 'text', text: content }],
+    });
     console.log("User message added to thread:", userMessage);
 
     // Initiate the assistant run
