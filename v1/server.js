@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import { PORT, URI } from "./config/index.js";
 import App from "./routes/index.js";
-import assistantRoutes from "./routes/assistant.js"; // Import the new assistant routes
+import assistantRoutes from "./routes/assistant.js";
+import authRoutes from "./routes/auth.js";
 
 const server = express();
 
@@ -30,8 +31,8 @@ mongoose
     .then(() => console.log("Connected to database"))
     .catch((err) => console.log(err));
 
-server.use(App);
-server.use("/v1/assistant", assistantRoutes); // Use the new assistant routes
+server.use("/v1/auth", authRoutes); // Use auth routes
+server.use("/v1/assistant", assistantRoutes);
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)

@@ -13,6 +13,7 @@ import {
 
 const router = express.Router();
 
+// Remove or comment out the `Verify` middleware
 router.post("/create-thread", createThread);
 router.post("/add-message", addMessage);
 router.get("/threads/:threadId/messages", listMessages);

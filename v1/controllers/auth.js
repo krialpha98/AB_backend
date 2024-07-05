@@ -65,9 +65,15 @@ export async function Register(req, res) {
 
 export async function Login(req, res) {
     const { email, password } = req.body;
+
+    // Log the received credentials
+    console.log("Received email:", email);
+    console.log("Received password:", password);
+
     try {
         const user = await User.findOne({ email }).select("+password");
         if (!user) {
+            console.log("User not found"); // Log user not found
             return res.status(401).json({
                 status: "failed",
                 message: "Account does not exist",
@@ -76,6 +82,7 @@ export async function Login(req, res) {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
+            console.log("Invalid password"); // Log invalid password
             return res.status(401).json({
                 status: "failed",
                 message: "Invalid email or password. Please try again with the correct credentials.",
@@ -102,6 +109,7 @@ export async function Login(req, res) {
             }
         });
     } catch (err) {
+        console.log("Error:", err); // Log the error
         res.status(500).json({
             status: "error",
             message: "Internal Server Error",
