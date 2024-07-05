@@ -28,7 +28,7 @@ export const createThread = async (req, res) => {
 
 export const getRunStatus = async (req, res) => {
   try {
-    const { threadId, runId } = req.params;
+    const { threadId, runId } = req.params; // Ensure both threadId and runId are captured
     const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
     res.status(200).json(runStatus);
   } catch (error) {
@@ -36,6 +36,7 @@ export const getRunStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const addMessage = async (req, res) => {
   try {
