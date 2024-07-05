@@ -14,15 +14,15 @@ import {Verify} from "../middleware/verify.js";
 
 const router = express.Router();
 
-// Remove or comment out the `Verify` middleware
+// Add the `Verify` middleware to all routes
 router.post("/create-thread", Verify, createThread);
-router.post("/add-message", addMessage);
-router.get("/threads/:threadId/messages", listMessages);
-router.get("/threads/:threadId/messages/:messageId", getMessage);
-router.post("/threads/:threadId/runs", createRun);
-router.get("/threads/:threadId/runs", listRuns);
-router.get("/threads/:threadId/runs/:runId", getRun);
-router.get("/threads/:threadId/runs/:runId/steps", listRunSteps);
-router.get("/threads/:threadId/runs/:runId/steps/:stepId", getRunStep);
+router.post("/add-message", Verify, addMessage);
+router.get("/threads/:threadId/messages", Verify, listMessages);
+router.get("/threads/:threadId/messages/:messageId", Verify, getMessage);
+router.post("/threads/:threadId/runs", Verify, createRun);
+router.get("/threads/:threadId/runs", Verify, listRuns);
+router.get("/threads/:threadId/runs/:runId", Verify, getRun);
+router.get("/threads/:threadId/runs/:runId/steps", Verify, listRunSteps);
+router.get("/threads/:threadId/runs/:runId/steps/:stepId", Verify, getRunStep);
 
 export default router;
