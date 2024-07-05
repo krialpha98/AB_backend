@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import Thread from "../models/Thread.js"; // Adjust the path as needed
+import Thread from "../models/Thread.js"; // Ensure this import is correct
 
 const openai = new OpenAI();
 

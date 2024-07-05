@@ -24,6 +24,6 @@ router.get("/threads/:threadId/runs", Verify, listRuns);
 router.get("/threads/:threadId/runs/:runId", Verify, getRun);
 router.get("/threads/:threadId/runs/:runId/steps", Verify, listRunSteps);
 router.get("/threads/:threadId/runs/:runId/steps/:stepId", Verify, getRunStep);
-router.get("/runs/:runId/status", Verify, getRunStatus);
+router.get("/runs/:runId/status", Verify, getRunStatus); // Ensure this is correct
 
 export default router;
