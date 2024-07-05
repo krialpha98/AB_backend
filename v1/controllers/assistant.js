@@ -27,12 +27,9 @@ export const createThread = async (req, res) => {
 };
 
 export const getRunStatus = async (req, res) => {
-  const { runId } = req.params;
-
   try {
-    const runStatus = await openai.beta.threads.runs.retrieve(runId);
-    console.log("Run status response:", runStatus);
-
+    const { threadId, runId } = req.params;
+    const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
     res.status(200).json(runStatus);
   } catch (error) {
     console.error("Error retrieving run status:", error);
@@ -44,20 +41,26 @@ export const addMessage = async (req, res) => {
   try {
     console.log("Received request to add message.");
     const { threadId, content } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
-    const message = await openai.beta.threads.messages.create(threadId, {
-      role: "user",
-      content: content,
+    // Add the user message to the thread
+    const userMessage = await openai.beta.threads.messages.create({
+      thread_id: threadId,
+      role: 'user',
+      content: [{ type: 'text', text: content }],
     });
-    console.log("User message added to thread:", message);
+    console.log("User message added to thread:", userMessage);
 
-    const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh",
-    });
-    console.log("Assistant run response:", run);
+    // Initiate the assistant run
+    const runResponse = await openai.beta.threads.runs.create(
+      threadId,
+      {
+        assistant_id: 'asst_qXe9zOvg7nDifslUtHCJY9Oh'
+      }
+    );
+    console.log("Assistant run response:", runResponse);
 
-    res.status(200).json({ runId: run.id });
+    res.status(200).json({ runId: runResponse.id });
   } catch (error) {
     console.error("Error adding message:", error);
     res.status(500).json({ error: error.message });
