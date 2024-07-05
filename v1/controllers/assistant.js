@@ -90,7 +90,7 @@ export const createRun = async (req, res) => {
   try {
     const { threadId } = req.params;
     const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: "your_assistant_id_here",
+      assistant_id: "asst_qXe9zOvg7nDifslUtHCJY9Oh",
     });
     res.status(200).json(run);
   } catch (error) {
