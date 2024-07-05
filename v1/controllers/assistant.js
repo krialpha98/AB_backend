@@ -44,11 +44,13 @@ export const addMessage = async (req, res) => {
     const userId = req.user.id;
 
     // Add the user message to the thread
-    const userMessage = await openai.beta.threads.messages.create({
-      thread_id: threadId,
-      role: 'user',  // Ensure the 'role' parameter is included
-      content: [{ type: 'text', text: content }],
-    });
+    const userMessage = await openai.beta.threads.messages.create(
+      threadId,
+      {
+        role: 'user', // Ensure the 'role' parameter is included
+        content: [{ type: 'text', text: content }],
+      }
+    );
     console.log("User message added to thread:", userMessage);
 
     // Initiate the assistant run
@@ -64,6 +66,15 @@ export const addMessage = async (req, res) => {
   }
 };
 
+const userMessage = await openai.beta.threads.messages.create(threadId, {
+  role: 'user', // Ensure the 'role' parameter is included
+  content: [{ type: 'text', text: content }],
+});
+console.log("Request sent to OpenAI:", {
+  threadId,
+  role: 'user',
+  content: [{ type: 'text', text: content }],
+});
 
 export const listMessages = async (req, res) => {
   try {
