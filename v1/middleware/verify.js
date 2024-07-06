@@ -4,21 +4,15 @@ import { SECRET_ACCESS_TOKEN } from '../config/index.js';
 import Blacklist from '../models/Blacklist.js';
 
 export async function Verify(req, res, next) {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-        console.log("No authorization header found");
-        return res.sendStatus(401);
-    }
-
-    const token = authHeader.split(" ")[1]; // Extract the token from "Bearer <token>"
+    const token = req.cookies["SessionID"];
     if (!token) {
-        console.log("Token not found in authorization header");
+        console.log("Token not found in cookies");
         return res.status(401).json({ message: "Unauthorized" });
     }
 
     console.log("Access token:", token);
 
-    const checkIfBlacklisted = await Blacklist.findOne({ token: token });
+    const checkIfBlacklisted = await Blacklist.findOne({ token });
     if (checkIfBlacklisted) {
         console.log("Token is blacklisted");
         return res.status(401).json({ message: "This session has expired. Please login" });

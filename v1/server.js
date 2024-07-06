@@ -11,7 +11,7 @@ const server = express();
 
 // Configure CORS
 const corsOptions = {
-    origin: '*', // Allow all origins for development purposes
+    origin: 'https://ab-frontend-heroku-b3741ff3df26.herokuapp.com', // Update with your frontend URL
     credentials: true,
 };
 

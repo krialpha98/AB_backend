@@ -1,4 +1,3 @@
-// v1/controllers/auth.js
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
@@ -101,7 +100,6 @@ export async function Login(req, res) {
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
-            token: token, // Include the token in the response body
             user: {
                 id: user._id,
                 name: user.first_name + " " + user.last_name,
@@ -118,18 +116,11 @@ export async function Login(req, res) {
     res.end();
 }
 
-
 export async function Logout(req, res) {
     try {
-        const authHeader = req.headers["authorization"];
-        if (!authHeader) {
-            console.log("No authorization header found");
-            return res.sendStatus(204);
-        }
-
-        const token = authHeader.split(" ")[1]; // Extract the token from "Bearer <token>"
+        const token = req.cookies["SessionID"];
         if (!token) {
-            console.log("Token not found in authorization header");
+            console.log("Token not found in cookies");
             return res.status(401).json({ message: "Unauthorized" });
         }
 
@@ -141,6 +132,8 @@ export async function Logout(req, res) {
 
         const newBlacklist = new Blacklist({ token });
         await newBlacklist.save();
+        
+        res.clearCookie("SessionID");
         res.status(200).json({ message: 'You are logged out!' });
     } catch (err) {
         res.status(500).json({
@@ -152,12 +145,7 @@ export async function Logout(req, res) {
 }
 
 export function validateToken(req, res) {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-        return res.status(401).json({ status: "failed", message: "No token provided" });
-    }
-
-    const token = authHeader.split(" ")[1];
+    const token = req.cookies["SessionID"];
     if (!token) {
         return res.status(401).json({ status: "failed", message: "No token provided" });
     }
