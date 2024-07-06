@@ -42,5 +42,8 @@ router.post(
 );
 
 router.post("/validate-token", validateToken);
+router.get("/me", Verify, (req, res) => {
+    res.status(200).json({ user: req.user });
+}); // New route to get the current user
 
 export default router;
