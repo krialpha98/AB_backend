@@ -10,6 +10,11 @@ const ThreadSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    lastInteraction: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

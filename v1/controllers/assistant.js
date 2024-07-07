@@ -3,6 +3,7 @@ import Thread from "../models/Thread.js"; // Ensure this import is correct
 
 const openai = new OpenAI();
 
+// Updated createThread
 export const createThread = async (req, res) => {
   try {
     console.log("Received request to create thread.");
@@ -15,6 +16,7 @@ export const createThread = async (req, res) => {
     const newThread = new Thread({
       threadId: thread.id,
       userEmail: userEmail,
+      lastInteraction: Date.now(),
     });
 
     await newThread.save();
@@ -27,6 +29,7 @@ export const createThread = async (req, res) => {
   }
 };
 
+// Updated addMessage
 export const addMessage = async (req, res) => {
   try {
     console.log("Received request to add message.");
@@ -44,6 +47,9 @@ export const addMessage = async (req, res) => {
       content: [{ type: 'text', text: content }],
     });
     console.log("User message added to thread:", userMessage);
+
+    // Update the last interaction time
+    await Thread.findOneAndUpdate({ threadId }, { lastInteraction: Date.now() });
 
     // Initiate the assistant run
     const runResponse = await openai.beta.threads.runs.create(threadId, {
