@@ -1,3 +1,4 @@
+// backend/routes/auth.js
 import express from "express";
 import { Register, Login, Logout, validateToken } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
@@ -45,5 +46,6 @@ router.post("/validate-token", validateToken);
 router.get("/me", Verify, (req, res) => {
     res.status(200).json({ user: req.user });
 }); // New route to get the current user
+router.get("/logout", Logout); // Ensure this line is included
 
 export default router;
