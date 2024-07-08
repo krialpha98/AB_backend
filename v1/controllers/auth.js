@@ -91,8 +91,8 @@ export async function Login(req, res) {
         let options = {
             maxAge: 20 * 60 * 1000, // 20 minutes
             httpOnly: true,         // Accessible only by web server
-            secure: false,          // Set to false for localhost
-            sameSite: "Lax",        // Allow cookies to be sent with the request from localhost
+            secure: true,           // HTTPS only
+            sameSite: "None",       // Allow cross-site cookies
         };
 
         const token = jwt.sign({ id: user._id }, SECRET_ACCESS_TOKEN, { expiresIn: '20m' });
