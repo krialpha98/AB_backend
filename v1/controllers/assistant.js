@@ -53,7 +53,7 @@ export const addMessage = async (req, res) => {
       role: 'user',  // Ensure the 'role' parameter is included
       content: [{ type: 'text', text: content }],
     });
-    console.log("User message added to thread:", userMessage);
+    // console.log("User message added to thread:", userMessage);
 
     // Update the last interaction time
     await Thread.findOneAndUpdate({ threadId }, { lastInteraction: Date.now() });
@@ -82,7 +82,7 @@ export const addMessage = async (req, res) => {
     const runResponse = await openai.beta.threads.runs.create(threadId, {
       assistant_id: 'asst_qXe9zOvg7nDifslUtHCJY9Oh',
     });
-    console.log("Assistant run response:", runResponse);
+    // console.log("Assistant run response:", runResponse);
 
     // print to log the id of the run
     console.log(`Run ID: ${runResponse.id}`);
@@ -117,7 +117,7 @@ export const getRunStatus = async (req, res) => {
     }
 
     const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
-    console.log("OpenAI run status retrieval response:", runStatus);
+    // console.log("OpenAI run status retrieval response:", runStatus);
 
     res.status(200).json(runStatus);
   } catch (error) {
