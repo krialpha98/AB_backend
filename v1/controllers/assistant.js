@@ -198,3 +198,24 @@ export const getLastThreads = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Add this function to the existing import statements
+export const getAllMessagesFromThread = async (req, res) => {
+  try {
+    const { threadId } = req.params;
+
+    console.log(`Received request to fetch all messages for threadId: ${threadId}`);
+
+    // Fetch all messages from the thread
+    const messages = await openai.beta.threads.messages.list(threadId);
+
+    // Print the raw result to the console
+    console.log("Fetched messages:", JSON.stringify(messages, null, 2));
+
+    // Return the raw result
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error("Error fetching messages from thread:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
