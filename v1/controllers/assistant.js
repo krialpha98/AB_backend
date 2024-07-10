@@ -84,7 +84,10 @@ export const addMessage = async (req, res) => {
     });
     console.log("Assistant run response:", runResponse);
 
-    res.status(200).json({ runId: runResponse.idx });
+    // print to log the id of the run
+    console.log(`Run ID: ${runResponse.id}`);
+
+    res.status(200).json({ runId: runResponse.id });
   } catch (error) {
     console.error("Error adding message:", error);
     res.status(500).json({ error: error.message });
@@ -109,6 +112,10 @@ export const getRunStatus = async (req, res) => {
     const { threadId, runId } = req.params; // Ensure both threadId and runId are captured
     console.log(`Received request to get run status for threadId: ${threadId}, runId: ${runId}`);
 
+    if (!threadId || !runId) {
+      throw new Error("threadId or runId is not defined");
+    }
+
     const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
     console.log("OpenAI run status retrieval response:", runStatus);
 
@@ -118,6 +125,7 @@ export const getRunStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getRunSteps = async (req, res) => {
   try {
