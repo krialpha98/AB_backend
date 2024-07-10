@@ -15,6 +15,10 @@ const ThreadSchema = new mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    chatName: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );

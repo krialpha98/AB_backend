@@ -29,7 +29,6 @@ export const createThread = async (req, res) => {
   }
 };
 
-// Updated addMessage
 export const addMessage = async (req, res) => {
   try {
     console.log("Received request to add message.");
@@ -41,6 +40,14 @@ export const addMessage = async (req, res) => {
       throw new Error("threadId is not defined");
     }
 
+    // Check if there are existing messages in the thread
+    const existingMessages = await openai.beta.threads.messages.list(threadId, {
+      limit: 1 // We only need to know if there's at least one message
+    });
+
+    const isFirstMessage = existingMessages.data.length === 0;
+    console.log(`Is this the first message in the thread? ${isFirstMessage}`);
+
     // Add the user message to the thread
     const userMessage = await openai.beta.threads.messages.create(threadId, {
       role: 'user',  // Ensure the 'role' parameter is included
@@ -51,13 +58,33 @@ export const addMessage = async (req, res) => {
     // Update the last interaction time
     await Thread.findOneAndUpdate({ threadId }, { lastInteraction: Date.now() });
 
+    let chatName = null;
+
+    if (isFirstMessage) {
+      // Generate a short description using GPT-3.5
+      const chatCompletion = await openai.chat.completions.create({
+        messages: [{ role: "system", content: "Generate a short description of this chat in no more than 6 words." }, { role: "user", content: content }],
+        model: "gpt-3.5-turbo",
+        max_tokens: 15,
+        temperature: 0.7,
+        n: 1,
+        stop: null
+      });
+
+      chatName = chatCompletion.choices[0].message.content.trim();
+      console.log(`Generated chat name: ${chatName}`);
+
+      // Update the thread entry in the database with the generated chat name
+      await Thread.findOneAndUpdate({ threadId }, { chatName });
+    }
+
     // Initiate the assistant run
     const runResponse = await openai.beta.threads.runs.create(threadId, {
       assistant_id: 'asst_qXe9zOvg7nDifslUtHCJY9Oh',
     });
     console.log("Assistant run response:", runResponse);
 
-    res.status(200).json({ runId: runResponse.id });
+    res.status(200).json({ runId: runResponse.idx });
   } catch (error) {
     console.error("Error adding message:", error);
     res.status(500).json({ error: error.message });
@@ -139,6 +166,27 @@ export const listMessages = async (req, res) => {
     res.status(200).json(messages.data);
   } catch (error) {
     console.error("Error listing messages:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// New getLastThreads function
+export const getLastThreads = async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    console.log(`Received request to get last 20 threads with chat names for user email: ${userEmail}`);
+
+    // Fetch the last 20 threads for the user that have a chatName, ordered by lastInteraction
+    const threads = await Thread.find({ userEmail, chatName: { $exists: true, $ne: null } })
+      .sort({ lastInteraction: -1 })
+      .limit(20)
+      .select('threadId lastInteraction chatName');
+
+    console.log(`Retrieved ${threads.length} threads with chat names for user email: ${userEmail}`);
+
+    res.status(200).json(threads);
+  } catch (error) {
+    console.error("Error fetching last threads with chat names:", error);
     res.status(500).json({ error: error.message });
   }
 };
