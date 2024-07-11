@@ -29,3 +29,4 @@ router.get("/user/last-threads", Verify, getLastThreads);
 router.get("/thread/:threadId/all-messages", Verify, getAllMessagesFromThread);
 
 export default router;
+
