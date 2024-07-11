@@ -26,7 +26,7 @@ router.post("/threads/:threadId/runs", Verify, createRun);
 router.get("/user/last-threads", Verify, getLastThreads);
 
 // New route to fetch all messages from a given thread ID
-router.get("/thread/:threadId/all-messages", getAllMessagesFromThread);
+router.get("/thread/:threadId/all-messages", Verify, getAllMessagesFromThread);
 
 export default router;
 
