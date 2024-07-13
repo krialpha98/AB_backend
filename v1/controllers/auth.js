@@ -65,14 +65,9 @@ export async function Register(req, res) {
 export async function Login(req, res) {
     const { email, password } = req.body;
 
-    // Log the received credentials
-    console.log("Received email:", email);
-    console.log("Received password:", password);
-
     try {
         const user = await User.findOne({ email }).select("+password");
         if (!user) {
-            console.log("User not found"); // Log user not found
             return res.status(401).json({
                 status: "failed",
                 message: "Account does not exist",
@@ -81,25 +76,18 @@ export async function Login(req, res) {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            console.log("Invalid password"); // Log invalid password
             return res.status(401).json({
                 status: "failed",
                 message: "Invalid email or password. Please try again with the correct credentials.",
             });
         }
 
-        let options = {
-            maxAge: 20 * 60 * 1000, // 20 minutes
-            httpOnly: true,         // Accessible only by web server
-            secure: true,           // HTTPS only
-            sameSite: "None",       // Allow cross-site cookies
-        };
-
         const token = jwt.sign({ id: user._id }, SECRET_ACCESS_TOKEN, { expiresIn: '20m' });
-        res.cookie("SessionID", token, options);
+        
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
+            token,
             user: {
                 id: user._id,
                 name: user.first_name + " " + user.last_name,
@@ -107,7 +95,6 @@ export async function Login(req, res) {
             }
         });
     } catch (err) {
-        console.log("Error:", err); // Log the error
         res.status(500).json({
             status: "error",
             message: "Internal Server Error",
@@ -115,6 +102,7 @@ export async function Login(req, res) {
     }
     res.end();
 }
+
 
 export async function Logout(req, res) {
     try {

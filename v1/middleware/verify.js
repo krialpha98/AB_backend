@@ -4,32 +4,26 @@ import { SECRET_ACCESS_TOKEN } from '../config/index.js';
 import Blacklist from '../models/Blacklist.js';
 
 export async function Verify(req, res, next) {
-    const token = req.cookies["SessionID"];
-    if (!token) {
-        console.log("Token not found in cookies");
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    console.log("Access token:", token);
+    const token = authHeader.split(' ')[1]; // Extract token from header
 
     const checkIfBlacklisted = await Blacklist.findOne({ token });
     if (checkIfBlacklisted) {
-        console.log("Token is blacklisted");
         return res.status(401).json({ message: "This session has expired. Please login" });
     }
 
     jwt.verify(token, SECRET_ACCESS_TOKEN, async (err, decoded) => {
         if (err) {
-            console.log("Token verification failed:", err.message);
             return res.status(401).json({ message: "This session has expired. Please login" });
         }
-
-        console.log("Decoded token:", decoded);
 
         const { id } = decoded;
         const user = await User.findById(id);
         if (!user) {
-            console.log("User not found");
             return res.status(401).json({ message: "User not found" });
         }
 
@@ -38,6 +32,7 @@ export async function Verify(req, res, next) {
         next();
     });
 }
+
 
 export function VerifyRole(req, res, next) {
     try {
