@@ -55,7 +55,7 @@ UserSchema.pre("save", function (next) {
 
 UserSchema.methods.generateAccessJWT = function () {
     let payload = { id: this._id };
-    return jwt.sign(payload, SECRET_ACCESS_TOKEN, { expiresIn: "20m" });
+    return jwt.sign(payload, SECRET_ACCESS_TOKEN, { expiresIn: "1d" });
 };
 
 export default mongoose.model("users", UserSchema);

@@ -63,10 +63,10 @@ export const addMessage = async (req, res) => {
     if (isFirstMessage) {
       // Generate a short description using GPT-3.5
       const chatCompletion = await openai.chat.completions.create({
-        messages: [{ role: "system", content: "Generate a short description of this chat in no more than 6 words." }, { role: "user", content: content }],
-        model: "gpt-3.5-turbo",
+        messages: [{ role: "system", content: "Genera una breve descrizione di questa chat in non più di 6 parole." }, { role: "user", content: content }],
+        model: "gpt-4o-mini",
         max_tokens: 15,
-        temperature: 0.7,
+        temperature: 0.5,
         n: 1,
         stop: null
       });
